@@ -1,0 +1,54 @@
+Read.me For Lab_2
+What this code does
+Uses a single neuron with fixed, pre-chosen weights to predict AND-gate outputs — no learning happens, it just makes predictions using a smooth (sigmoid) activation function instead of a hard step.
+Line-by-Line Explanation
+
+python
+import numpy as np
+Loads NumPy for array/math operations.
+
+python
+X = np.array([[0,0],[0,1],[1,0],[1,1]])
+y = np.array([0,0,0,1])
+Same AND-gate dataset as before: 4 input pairs and their correct outputs.
+
+python
+w = np.array([0.5, 0.5])
+b = -0.7
+Manually chosen weights and bias (not learned) — these specific numbers happen to work for AND logic.
+
+python
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+The activation function — instead of a hard 0/1 switch, it smoothly squashes any number into a value between 0 and 1 (like a confidence score):
+	•	Big positive number → close to 1
+	•	Big negative number → close to 0
+	•	Exactly 0 → exactly 0.5
+
+python
+print("Predictions:")
+Prints a header.
+
+python
+for i in range(len(X)):
+Loops through each row index in X (0 to 3).
+
+python
+    z = np.dot(X[i], w) + b
+Calculates the weighted sum: multiplies each input by its matching weight, sums them, then adds the bias.
+
+python
+    output = sigmoid(z)
+Passes z through sigmoid to get a probability-like number between 0 and 1.
+
+python
+    prediction = 1 if output >= 0.5 else 0
+Converts that probability into a final decision:
+	•	≥ 0.5 → predict 1
+	•	< 0.5 → predict 0
+
+python
+print("Input:", X[i],
+"Output:", round(output,4),
+"Prediction:", prediction)
+⚠️ Bug: this line is not indented inside the loop, so it only runs once (after the loop ends), printing results only for the last row [1,1]. To fix, indent it to match the lines above so it runs every iteration.
