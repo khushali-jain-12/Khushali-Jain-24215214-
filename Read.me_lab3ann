@@ -1,0 +1,178 @@
+Read.me For Lab3:-
+Neural Network using PyTorch
+What this code does
+Builds a proper multi-layer neural network (not just a single neuron) using PyTorch, and trains it to learn the AND gate. Unlike your earlier codes, this has a hidden layer, making it a true "deep learning" style model, even though it's small.
+Line-by-Line Explanation
+
+python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+	•	torch — the core PyTorch library for working with tensors (like NumPy arrays, but built for deep learning).
+	•	torch.nn — contains tools to build neural network layers.
+	•	torch.optim — contains optimizers (algorithms that help the model learn/improve).
+The Dataset
+
+python
+X = torch.tensor([[0,0],[0,1],[1,0],[1,1]], dtype=torch.float32)
+The 4 input combinations for the AND gate, stored as a tensor (PyTorch's version of an array). dtype=torch.float32 just means "store these as decimal numbers."
+
+python
+y = torch.tensor([[0],[0],[0],[1]], dtype=torch.float32)
+The correct AND-gate answers, one per row, also as a tensor.
+Building the Neural Network
+
+python
+class NeuralNetwork(nn.Module):
+Creates a custom neural network by building on PyTorch's base nn.Module class — this is the standard way to define models in PyTorch.
+
+python
+    def __init__(self):
+        super().__init__()
+Sets up the network. super().__init__() just makes sure PyTorch's internal setup runs properly before we add our own layers.
+
+python
+        self.layer1 = nn.Linear(2, 4)   # Input → Hidden
+Creates the first layer: takes 2 inputs (our AND gate inputs) and connects them to 4 hidden neurons. Think of this as 4 mini-decision-makers, each looking at the same 2 inputs but forming a different "opinion."
+
+python
+        self.relu = nn.ReLU()           # Activation
+ReLU is an activation function (like step or sigmoid, but different). It's very simple:
+	•	If a number is positive → keep it as is
+	•	If a number is negative → turn it into 0
+It helps the network learn more complex, non-straight-line patterns.
+
+python
+        self.layer2 = nn.Linear(4, 1)   # Hidden → Output
+The second layer: takes the 4 hidden neuron outputs and combines them into 1 final output.
+
+python
+        self.sigmoid = nn.Sigmoid()     # Output Activation
+Squashes the final output into a value between 0 and 1 (a confidence score), just like in your earlier sigmoid code.
+
+python
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.relu(x)
+        x = self.layer2(x)
+        x = self.sigmoid(x)
+        return x
+This defines how data flows through the network — like a recipe:
+	1	Input goes through layer 1 (2 → 4 neurons)
+	2	Passes through ReLU (activation)
+	3	Goes through layer 2 (4 → 1 neuron)
+	4	Passes through sigmoid (final probability)
+	5	Returns the result
+Setting Up Training
+
+python
+model = NeuralNetwork()
+Creates an instance of the network defined above.
+
+python
+loss_function = nn.BCELoss()
+BCELoss = Binary Cross-Entropy Loss. This measures how wrong the model's predictions are, specifically for binary (yes/no) problems. Bigger mistakes = bigger loss value.
+
+python
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+Adam is a smart optimization algorithm that automatically adjusts the model's weights to reduce the loss. lr=0.01 is the learning rate — how big each learning step is.
+Training Loop
+
+python
+for epoch in range(100):
+    output = model(X)
+    loss = loss_function(output, y)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+Repeats 100 times (100 epochs):
+	1	output = model(X) — run all inputs through the network to get predictions.
+	2	loss = loss_function(output, y) — measure how wrong those predictions are compared to the correct answers.
+	3	optimizer.zero_grad() — clears old gradient calculations (housekeeping step, prevents mixing up old and new corrections).
+	4	loss.backward() — calculates how much each weight contributed to the error (this is called backpropagation).
+	5	optimizer.step() — actually updates the weights to reduce future error.
+This is the core "learning loop" — repeat, measure mistakes, adjust, repeat again.
+Making Predictions
+
+python
+print("Predictions:")
+
+with torch.no_grad():
+    prediction = model(X)
+torch.no_grad() tells PyTorch: "we're just testing now, don't bother tracking calculations for learning." This makes prediction faster and uses less memory.
+
+python
+for i in range(len(X)):
+    print(X[i].tolist(), "->", int(prediction[i] >= 0.5))
+For each input, converts the tensor to a normal Python list for clean printing, and turns the sigmoid output into a final 0 or 1 using the 0.5 cutoff.
+Key idea
+This is a real neural network with a hidden layer, letting it learn more complex patterns than a single perceptron — though for a simple AND gate, that extra power isn't strictly necessary.
+
+Neural Network using TensorFlow/Keras
+What this code does
+Builds essentially the same kind of neural network as Code 1, but using TensorFlow's Keras API — a different, often more beginner-friendly way to write the same deep learning logic.
+Line-by-Line Explanation
+
+python
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+	•	numpy — for arrays.
+	•	Sequential — a simple way to build a neural network by stacking layers one after another, like building blocks.
+	•	Dense — a "fully connected" layer, meaning every input connects to every neuron in that layer (same idea as PyTorch's nn.Linear).
+The Dataset
+
+python
+X = np.array([[0,0],[0,1],[1,0],[1,1]])
+y = np.array([[0],[0],[0],[1]])
+Same AND-gate dataset as always: 4 input pairs and their correct outputs, stored as NumPy arrays this time (not tensors).
+Building the Neural Network
+
+python
+model = Sequential()
+Creates an empty model that we'll add layers to, one after another, in sequence.
+
+python
+model.add(Dense(4, input_dim=2, activation='relu'))
+Adds the first layer:
+	•	4 — 4 hidden neurons (same as PyTorch's hidden layer).
+	•	input_dim=2 — tells the model to expect 2 inputs.
+	•	activation='relu' — applies ReLU activation right inside this layer (Keras lets you combine the layer + activation in one line).
+
+python
+model.add(Dense(1, activation='sigmoid'))
+Adds the output layer:
+	•	1 — a single output neuron.
+	•	activation='sigmoid' — squashes the output into a 0–1 probability, just like before.
+Compiling the Model
+
+python
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+This configures how the model will learn:
+	•	optimizer='adam' — same Adam optimizer as in PyTorch, adjusts weights smartly.
+	•	loss='binary_crossentropy' — same as PyTorch's BCELoss; measures how wrong predictions are for binary classification.
+	•	metrics=['accuracy'] — also tracks accuracy (% correct) during training, just for extra info.
+Training the Model
+
+python
+model.fit(X, y, epochs=100, verbose=0)
+This one line does the entire training loop automatically (unlike PyTorch, where you wrote the loop manually):
+	•	X, y — inputs and correct answers.
+	•	epochs=100 — train for 100 full passes over the data.
+	•	verbose=0 — don't print progress logs during training (keep it silent).
+Behind the scenes, Keras is doing the same steps as PyTorch: predict → measure error → adjust weights → repeat.
+Making Predictions
+
+python
+print("Predictions:")
+
+prediction = model.predict(X)
+Runs all 4 inputs through the trained model and stores the sigmoid outputs (probabilities between 0 and 1).
+
+python
+for i in range(len(X)):
+    print(X[i], "->", int(prediction[i] >= 0.5))
+For each input, converts its probability into a final 0 or 1 prediction using the 0.5 cutoff, and prints the result.
