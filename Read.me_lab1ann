@@ -1,0 +1,78 @@
+Readme For Lab 1:- 
+
+What this code does
+Builds a simple learning model (a perceptron) that trains itself to behave like an AND gate, using trial-and-error correction over multiple rounds.
+Line-by-Line Explanation
+
+python
+import numpy as np
+Loads NumPy — a library for handling arrays and math operations.
+
+python
+def step(x):
+    if x >= 0:
+        return 1
+    else:
+        return 0
+The activation function. It's a hard switch:
+	•	Number ≥ 0 → output 1
+	•	Number < 0 → output 0
+
+python
+class Perceptron:
+Defines a blueprint for creating a perceptron object (a mini decision-making unit).
+
+python
+    def __init__(self):
+        self.weights = np.array([0.0, 0.0])
+        self.bias = 0.0
+        self.learning_rate = 0.1
+Runs when a new Perceptron is created:
+	•	weights — start at 0 (no knowledge yet); one weight per input.
+	•	bias — start at 0; an adjustable "head start" number.
+	•	learning_rate — how big each correction step is (small = careful learning).
+
+python
+    def predict(self, inputs):
+        total = np.dot(inputs, self.weights) + self.bias
+        return step(total)
+Makes a guess:
+	1	np.dot(inputs, self.weights) — multiplies each input by its weight and adds them up.
+	2	Adds the bias.
+	3	Passes the result through step() to get a final 0 or 1.
+
+python
+    def train(self, X, y, epochs):
+        for _ in range(epochs):
+            for inputs, target in zip(X, y):
+                prediction = self.predict(inputs)
+                error = target - prediction
+
+                self.weights = self.weights + self.learning_rate * error * inputs
+                self.bias = self.bias + self.learning_rate * error
+The learning process:
+	•	epochs = how many times to loop through all the training data.
+	•	For each input/target pair:
+	•	Make a prediction.
+	•	Calculate error = correct answer − guess.
+	•	If correct → error = 0 → nothing changes.
+	•	If wrong → error is +1 or −1 → weights/bias get nudged.
+	•	Update weights and bias in the direction that reduces future error.
+
+python
+X = np.array([[0,0],[0,1],[1,0],[1,1]])
+y = np.array([0, 0, 0, 1])
+The AND gate dataset: all 4 input combinations, with the correct AND answer for each.
+
+python
+p = Perceptron()
+p.train(X, y, 10)
+Creates a perceptron and trains it for 10 full passes over the data.
+
+python
+print("Predictions:")
+for data in X:
+    print(data, "->", p.predict(data))
+Tests the trained model on each input and prints what it predicts.
+Key idea
+This model starts knowing nothing and learns through repeated correction — like practicing a skill until you stop making mistakes.
