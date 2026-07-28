@@ -1,0 +1,221 @@
+1. Keras
+Keras is a deep learning library built on TensorFlow. It is used to easily create, train, and test neural network models.
+
+2. MLP (Multi-Layer Perceptron)
+MLP is a type of Artificial Neural Network that has an input layer, one or more hidden layers, and an output layer. It is used for classification and prediction tasks.
+
+3. Multiclass Classification
+Multiclass classification is a problem where the model predicts one class out of three or more classes.
+Example: Cat, Dog, Horse.
+
+4. Iris Dataset
+The Iris dataset contains 150 flower samples of 3 different species. Each sample has 4 features used for classification.
+
+5. Features and Target
+	•	Features (X): Input values given to the model.
+	•	Target (y): Output or class that the model predicts.
+
+6. StandardScaler (Normalization)
+StandardScaler scales all feature values to a similar range, helping the model learn faster and perform better.
+
+7. One-Hot Encoding
+One-Hot Encoding converts class labels like 0, 1, 2 into binary vectors such as [1 0 0], [0 1 0], [0 0 1].
+
+8. Train-Test Split
+The dataset is divided into:
+
+	•	Training Data – Used to train the model.
+	•	Testing Data – Used to evaluate the model.
+
+9. Sequential Model
+A Sequential model is a neural network where layers are added one after another.
+
+10. Dense Layer
+A Dense layer is a fully connected layer, where every neuron is connected to every neuron in the next layer.
+
+11. Hidden Layer
+Hidden layers process the input data and learn patterns before sending information to the output layer.
+
+12. Neurons
+Neurons are the basic units of a neural network that receive input, perform calculations, and produce output.
+
+13. Activation Function
+An activation function decides whether a neuron should pass its output to the next layer.
+	•	ReLU: Used in hidden layers.
+	•	Softmax: Used in the output layer for multiclass classification.
+
+14. Optimizer
+An optimizer updates the model’s weights to reduce errors during training. In this program, Adam optimizer is used.
+
+15. Loss Function
+The loss function measures how much the model’s predictions differ from the actual values. For multiclass classification, Categorical Crossentropy is used.
+
+16. Accuracy
+Accuracy is the percentage of correctly predicted samples out of the total samples.
+
+17. Epoch
+An epoch is one complete pass of the entire training dataset through the neural network.
+
+18. Batch Size
+Batch size is the number of training samples processed before the model updates its weights.
+
+19. Validation Split
+Validation split reserves a small part of the training data to check the model’s performance during training.
+
+20. Prediction
+Prediction is the final output of the trained model, where it predicts the class of new or unseen data.
+
+Step 1: Import Libraries
+
+Code:
+import numpy as np
+
+Imports the NumPy library, which is used for numerical operations and handling arrays.
+
+Code:
+from sklearn.datasets import load_iris
+
+Imports the load_iris() function to load the Iris dataset.
+
+Code:
+from sklearn.model_selection import train_test_split
+
+Imports the function used to split the dataset into training and testing sets.
+
+Code:
+from sklearn.preprocessing import StandardScaler
+
+Imports the StandardScaler class to normalize the feature values.
+
+Code:
+from tensorflow.keras.models import Sequential
+
+Imports the Sequential model, which is used to build the neural network layer by layer.
+
+Code:
+from tensorflow.keras.layers import Dense
+
+Imports the Dense layer, which creates fully connected layers in the neural network.
+
+Code:
+from tensorflow.keras.utils import to_categorical
+
+Imports the function used to convert class labels into one-hot encoded vectors.
+
+
+Step 2: Load the Dataset
+
+Code:
+iris = load_iris()
+
+Loads the Iris dataset into the variable iris.
+
+Code:
+X = iris.data
+
+Stores the four input features (Sepal Length, Sepal Width, Petal Length, and Petal Width) in the variable X.
+
+Code:
+y = iris.target
+
+Stores the target labels (0, 1, and 2), which represent the three flower species, in the variable y.
+
+
+Step 3: Normalize the Features
+
+Code:
+scaler = StandardScaler()
+
+Creates an object of the StandardScaler class.
+
+Code:
+X = scaler.fit_transform(X)
+
+Calculates the scaling values and normalizes all the input features so they have a similar range. This improves the model’s performance.
+
+Step 4: One-Hot Encoding
+
+Code:
+y = to_categorical(y)
+
+Converts the output labels into one-hot encoded vectors. For example, class 0 becomes [1,0,0], class 1 becomes [0,1,0], and class 2 becomes [0,0,1].
+
+Step 5: Split the Dataset
+
+Code:
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+Splits the dataset into training and testing sets. Here, 80% of the data is used for training and 20% is used for testing. The random_state=42 ensures that the same data split is generated every time the program runs.
+
+Step 6: Create the Model
+
+Code:
+model = Sequential()
+
+Creates an empty Sequential neural network model in which layers are added one after another.
+
+Step 7: Add the First Hidden Layer
+
+Code:
+model.add(Dense(16, activation='relu', input_shape=(4,)))
+
+Adds the first hidden layer with 16 neurons. The ReLU activation function is used, and input_shape=(4,) indicates that the model receives four input features.
+
+Step 8: Add the Second Hidden Layer
+
+Code:
+model.add(Dense(8, activation='relu'))
+
+Adds the second hidden layer with 8 neurons and uses the ReLU activation function to learn more complex patterns.
+
+Step 9: Add the Output Layer
+
+Code:
+model.add(Dense(3, activation='softmax'))
+
+Adds the output layer with 3 neurons, one for each flower class. The Softmax activation function converts the outputs into probabilities.
+
+Step 10: Compile the Model
+
+Code:
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+Compiles the model using the Adam optimizer, Categorical Crossentropy loss function, and Accuracy as the evaluation metric.
+
+Step 11: Train the Model
+
+Code:
+history = model.fit(X_train, y_train, epochs=50, batch_size=8, validation_split=0.2)
+
+Trains the model using the training data. The model learns for 50 epochs, processes 8 samples at a time, and uses 20% of the training data for validation during training.
+
+Step 12: Evaluate the Model
+
+Code:
+loss, accuracy = model.evaluate(X_test, y_test)
+
+Evaluates the trained model using the test dataset and calculates the loss and accuracy.
+
+Code:
+print("Test Accuracy:", accuracy)
+
+Displays the test accuracy of the model.
+
+Step 13: Make Predictions
+
+Code:
+predictions = model.predict(X_test)
+
+Uses the trained model to predict the probabilities of each class for the test data.
+
+Step 14: Display Predicted Classes
+
+Code:
+print(np.argmax(predictions, axis=1))
+
+The argmax() function selects the class with the highest probability and displays the predicted class labels.
+
+Step 15: Display Actual Classes
+
+Code:
+print(np.argmax(y_test, axis=1))
